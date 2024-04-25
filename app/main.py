@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> None:
     string_len, num_of_strs = 8, 4
     list_of_ids = [''.join(random.choices(string.ascii_letters + string.digits, k=string_len)) for _ in range(num_of_strs)]
     app.app_identifier = '-'.join(list_of_ids)
