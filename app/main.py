@@ -12,7 +12,7 @@ app = FastAPI(title='Celsiusify')
 @app.on_event("startup")
 async def startup_event() -> None:
     """
-    Generate and set a random application identifier on startup.
+    Generate and set an application identifier on startup.
     """
     string_len, constants_str = 8, string.ascii_letters + string.digits
     list_of_ids = [''.join(random.choices(constants_str, k=string_len)) for _ in range(stop=4)]
@@ -29,7 +29,7 @@ async def convert_temperature(fahrenheit: float) -> Dict[str, str]:
         fahrenheit (float): Temperature in Fahrenheit.
 
     Returns:
-        Dict[str, str]: Dictionary containing converted temperature in Celsius and application identifier.
-    """   
+        Dict[str, str]: Dictionary containing converted temperature in Celsius and app identifier.
+    """
     celsius = (fahrenheit - 32) * 5.0/9.0
     return {"celsius": f'{celsius:.6f}', "app_identifier": app.app_identifier}
