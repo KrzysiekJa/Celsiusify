@@ -3,7 +3,6 @@ from locust import HttpUser, task, between
 
 
 class WebsiteUser(HttpUser):
-    
     """
         Own locustfile, used for load testing with Locust, a dedicated load testing tool.
         The script is provided for the chart that will be created to store the Locust files in Kubernetes.
