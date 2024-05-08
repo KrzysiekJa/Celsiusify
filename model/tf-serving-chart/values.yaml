@@ -5,7 +5,7 @@ namespace: default
 image:
   name: tf-serving-model-minimal
   tag: latest
-  owner: krzysiek77
+  owner: <dockerhub-username>
   pullPolicy: IfNotPresent
 container:
   name: tf-serving-model-container

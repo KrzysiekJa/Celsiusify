@@ -5,7 +5,7 @@ namespace: default
 image:
   name: celsiusify
   tag: latest
-  owner: krzysiek77
+  owner: <dockerhub-username>
   pullPolicy: IfNotPresent
 container:
   name: celsiusify-container
