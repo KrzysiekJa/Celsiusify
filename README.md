@@ -6,34 +6,122 @@
 
 **DevOps** (Development and Operations) work on tasks that bridge the gap between software development and IT operations teams.
 
-## Step 1. Backend Web Application
+## Step 1. Backend web application
 
 **Project Initialization**:
 
-* A new directory is created for the project, and within it, a Python virtual environment is set up.
-* FastAPI and Uvicorn are installed using pip to facilitate the creation of the web app.
+* A new directory is created for the Celsiusify project, and within it, a **Python 3.9** virtual environment (.venv) is set up.
+
+``` bash
+   # installation of pyenv (if not installed) -> recommended solution
+   # following instructions from: https://github.com/pyenv/pyenv
+   curl https://pyenv.run | bash
+
+   pyenv install 3.9
+   pyenv virtualenv 3.9 celsiusify
+   pyenv activate celsiusify
+```
+
+* FastAPI and Uvicorn are installed using **pip** to facilitate the creation of the web app.
+
+   It's achieved thru defining requirements.txt file:
+
+``` requirements.txt
+   fastapi>=0.68.0,<0.69.0+
+   pydantic>=1.8.0,<2.0.0
+   uvicorn>=0.15.0,<0.16.0
+```
+
+``` bash
+   pip install -r requirements.txt
+```
 
 **API Endpoint Development**:
 
-* A FastAPI application is developed, featuring an endpoint designed to convert temperatures from Fahrenheit to Celsius.
-* The TensorFlow model (`saved_model.pb`) is integrated into the app to handle temperature conversion.
+* A FastAPI application is developed, featuring an endpoint designed to convert temperatures from Fahrenheit to Celsius degrees:
 
-**App Initialization and Identification**:
+``` python3
+   app = FastAPI(title='Celsiusify')
 
-* During the initialization phase of the FastAPI app, a unique identifier is generated, which persists throughout the application's runtime.
+   @app.on_event("startup")
+   async def startup_event() -> None:
+      string_len, constants_str = 8, string.ascii_letters + string.digits
+      list_of_ids = [''.join(random.choices(constants_str, k=string_len)) for _ in range(stop=4)]
+      app.app_identifier = '-'.join(list_of_ids)
 
-## Step 2. Docker Image
+   @app.get("/convert/")
+   async def convert_temperature(fahrenheit: float) -> Dict[str, str]:
+      celsius = (fahrenheit - 32) * 5.0/9.0
+      return {"celsius": f'{celsius:.6f}', "app_identifier": app.app_identifier}
+```
+
+During the initialization phase of the Celsiusify app, a unique identifier is generated, which persists throughout the application's runtime.
+
+**App Initialization and Runtime**:
+
+* Application can be run thanks to Uvicorn server starting with following command:
+
+``` bash
+   uvicorn app.main:app --host 0.0.0.0 --port 80
+```
+
+![celsiusify_api](pictures/celsiusify_api.jpg)
+![celsiusify_api_example](pictures/celsiusify_api_example.jpg)
+
+## Step 2. Docker image
 
 **Dockerfile Composition**:
 
 * A Dockerfile is authored to encapsulate the FastAPI application within a Docker image.
-* This Dockerfile includes instructions for installing dependencies, copying necessary files, and exposing the required port.
 
-**Build and Verification**:
+   Of course, first it is necessary to install docker tools as desired: <https://docs.docker.com/engine/install/>.
 
-* Locally, the Docker image is constructed and validated to ensure proper functionality and adherence to expectations.
+* Written Dockerfile includes instructions for installing dependencies, copying necessary files, and exposing the required port *80*.
 
-## Step 3. Helm Chart for FastAPI
+``` docker
+   FROM python:3.9-slim
+   # environment variable
+   ENV PYTHONUNBUFFERED 1
+
+   WORKDIR /code
+
+   COPY ./requirements.txt /code/requirements.txt
+
+   RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+
+   COPY ./app /code/app
+
+   CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
+```
+
+**Building Docker Image**:
+
+* Locally, the Docker image is constructed and on that way tested to ensure proper functionality and adherence to expectations.
+
+``` bash
+   docker build -t celsiusify:latest .
+   docker images
+   docker run --name celsiusify-container -p 80:80 celsiusify:latest
+```
+
+![work_of_image](pictures/work_of_image.png)
+
+![docker_desktop_screen](pictures/docker_desktop_screen.jpg)
+
+**Pushing to DockerHub**:
+
+* At the end of this step, a good solution is to rely on DockerHub to push the image there using platform account.
+
+``` bash
+   docker tag celsiusify:latest <username>/celsiusify:latest
+   docker push <username>/celsiusify:latest
+```
+
+Helpful resources:
+
+<https://fastapi.tiangolo.com/deployment/docker/>
+
+## Step 3. Helm chart for Celsiusify
 
 **Chart Structure Setup**:
 
@@ -44,7 +132,7 @@
 * Configuration files for deployment (`deployment.yaml`) and service (`service.yaml`) are tailored to meet the app's requirements.
 * Auto-scaling based on CPU usage metrics is implemented to dynamically adjust app replicas.
 
-## Step 4. Locust for Performance Testing
+## Step 4. Locust for performance testing
 
 **Locust Dockerization**:
 
@@ -58,14 +146,14 @@
 
 * The Locust Helm chart is deployed, initiating performance tests against the FastAPI application.
 
-## Step 5. CI Pipeline implementation
+## Step 5. CI pipeline implementation
 
 **Pipeline Configuration**:
 
 * A CI pipeline is established utilizing tools like GitHub Actions or Jenkins.
 * Stages within the pipeline are configured to encompass linting, testing, Docker image building, Docker Hub pushing, and Helm chart syntax validation.
 
-## Step 6. TensorFlow Model with TensorFlow Serving
+## Step 6. TensorFlow model with TensorFlow Serving
 
 **TensorFlow Serving Docker Image Creation**:
 
@@ -79,7 +167,7 @@
 
 * The performance tests conducted with Locust are replicated with the TensorFlow Serving deployment to gauge its efficiency.
 
-## Step 7. Statistics Files and Report
+## Step 7. Statistics files and report
 
 **Evaluation of Performance Metrics**:
 
