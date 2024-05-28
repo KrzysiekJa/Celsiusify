@@ -4,7 +4,7 @@
 
 ### *(DEMO Readme)*
 
-**DevOps** (Development and Operations) work on tasks that bridge the gap between software development and IT operations teams.
+**DevOps** (Development and Operations) work on tasks that **bridge** the gap between software development and IT operations teams.
 
 ## Step 1. Backend web application
 
@@ -26,7 +26,7 @@
 
    It's achieved thru defining requirements.txt file:
 
-``` requirements.txt
+``` plain
    fastapi>=0.68.0,<0.69.0+
    pydantic>=1.8.0,<2.0.0
    uvicorn>=0.15.0,<0.16.0
@@ -78,7 +78,7 @@ During the initialization phase of the Celsiusify app, a unique identifier is ge
 
 * Written Dockerfile includes instructions for installing dependencies, copying necessary files, and exposing the required port *80*.
 
-``` docker
+``` dockerfile
    FROM python:3.9-slim
    # environment variable
    ENV PYTHONUNBUFFERED 1
@@ -123,6 +123,21 @@ Helpful resources:
 
 ## Step 3. Helm chart for Celsiusify
 
+**Pre-requirements:**
+
+To complete this step, it is needed to have already installed **kubectl** and **kubernetes** (or [**minikube**](https://minikube.sigs.k8s.io/docs/start/)).
+
+*Tip*: follow guideness from <https://linuxiac.com/how-to-install-minikube-on-linux/>.
+
+To commands to start up **minikube** dashboard:
+
+``` bash
+   minikube start --driver=docker    
+   minikube addons enable metrics-server   
+   minikube addons enable dashboard  
+   minikube dashboard
+```
+
 **Chart Structure Setup**:
 
 * A directory structure is established for the Helm chart, incorporating essential templates and values files.
@@ -150,7 +165,7 @@ Helpful resources:
 
 **Pipeline Configuration**:
 
-* A CI pipeline is established utilizing tools like GitHub Actions or Jenkins.
+* A CI pipeline is established utilizing tools like **GitHub Actions** or Jenkins.
 * Stages within the pipeline are configured to encompass linting, testing, Docker image building, Docker Hub pushing, and Helm chart syntax validation.
 
 ## Step 6. TensorFlow model with TensorFlow Serving
