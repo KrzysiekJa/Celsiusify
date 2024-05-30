@@ -135,12 +135,55 @@ To commands to start up **minikube** dashboard:
    minikube start --driver=docker    
    minikube addons enable metrics-server   
    minikube addons enable dashboard  
-   minikube dashboard
+   minikube dashboard   
 ```
 
 **Chart Structure Setup**:
 
-* A directory structure is established for the Helm chart, incorporating essential templates and values files.
+* A directory structure is established for the Helm chart, incorporating essential templates and values files. Below is shown celsiusify-chart directory structure:
+
+``` directory
+   /my_project
+   |-- /app
+   |   |-- main.py
+   |-- /celsiusify-chart
+   |   |-- Chart.yaml
+   |   |-- values.yaml
+   |   |-- /templates
+   |       |-- deployment.yaml
+   |       |-- service.yaml
+   |-- requirements.txt
+   |-- Dockerfile
+   |-- README.md
+```
+
+Configuration for
+ celsiusify-chart/values.yaml
+
+``` helm
+   replicaCount: 1
+   app:
+   name: celsiusify
+   namespace: default
+   image:
+   name: celsiusify
+   tag: latest
+   owner: <dockerhub-username>
+   pullPolicy: IfNotPresent
+   container:
+   name: celsiusify-container
+   service:
+   type: ClusterIP
+   port: 8080
+   targetPort: 80
+   autoscaling:
+   enabled: true
+   minReplicas: 1
+   maxReplicas: 5
+   targetCPUUtilizationPercentage: 50
+```
+
+ -> 
 
 **Configuration of Deployment and Service**:
 
