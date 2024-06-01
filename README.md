@@ -157,10 +157,9 @@ To commands to start up **minikube** dashboard:
    |-- README.md
 ```
 
-Configuration for
- celsiusify-chart/values.yaml
+Configuration for kubernetes environment is put in  `celsiusify-chart/values.yaml`:
 
-``` helm
+``` kubernetes
    replicaCount: 1
    app:
    name: celsiusify
@@ -183,7 +182,7 @@ Configuration for
    targetCPUUtilizationPercentage: 50
 ```
 
- -> 
+The `celsiusify-chart/values.yaml` file configures the deployment of the Celsiusify application in a Kubernetes environment using Helm. It ensures the Celsiusify application is deployed with appropriate scaling and service exposure settings in a Kubernetes environment.
 
 **Configuration of Deployment and Service**:
 
