@@ -187,7 +187,30 @@ The `celsiusify-chart/values.yaml` file configures the deployment of the Celsius
 **Configuration of Deployment and Service**:
 
 * Configuration files for deployment (`deployment.yaml`) and service (`service.yaml`) are tailored to meet the app's requirements.
+
+[celsiusify-chart/templates/deployment.yaml](https://github.com/KrzysiekJa/Celsiusify/blob/main/celsiusify-chart/templates/deployment.yaml)  
+[celsiusify-chart/templates/service.yaml](https://github.com/KrzysiekJa/Celsiusify/blob/main/celsiusify-chart/templates/service.yaml)
+
 * Auto-scaling based on CPU usage metrics is implemented to dynamically adjust app replicas.
+
+Also, in Dockerfile special uvicorn flag "--proxy-headers" is added in its call command.
+
+``` bash
+   helm package celsiusify-chart
+   helm upgrade -i celsiusify ./celsiusify-release-0.1.0.tgz
+```
+
+![release_kube_dashboard](pictures/release_kube_dashboard_deploy.jpg)
+![release_kube_dashboard_service](pictures/release_kube_dashboard_service.jpg)
+![kube_hpa_terminal](pictures/kube_hpa_terminal.jpg)
+
+When the CPU usage of the pods exceeds the target CPU utilization percentage specified in the Horizontal Pod Autoscaler (HPA) configuration, then the HPA triggers and requests more pods to be created. The HPA communicates with the Kubernetes control plane, which then instructs the Deployment controller to create additional pods.
+
+Helpful resources:
+
+<https://tamerlan.dev/load-balancing-in-kubernetes-a-step-by-step-guide/>  
+<https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/>  
+<https://kubernetes.io/docs/tasks/debug/debug-application/debug-service/>  
 
 ## Step 4. Locust for performance testing
 
