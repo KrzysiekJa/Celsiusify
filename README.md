@@ -2,15 +2,13 @@
 
 ### DevOps (MLOps) benchmark project
 
-### *(DEMO Readme)*
-
 **DevOps** (Development and Operations) work on tasks that **bridge** the gap between software development and IT operations teams.
 
 ## Step 1. Backend web application
 
 **Project Initialization**:
 
-* A new directory is created for the Celsiusify project, and within it, a **Python 3.9** virtual environment (.venv) is set up.
+* A new directory is created for the Celsiusify project, and within it, a **Python 3.9** virtual environment (.venv) is set up (of course, it's possible to use newer Python, but in case if FastAPI would cooperate with it).
 
 ``` bash
    # installation of pyenv (if not installed) -> recommended solution
@@ -193,7 +191,7 @@ The `celsiusify-chart/values.yaml` file configures the deployment of the Celsius
 
 * Auto-scaling based on CPU usage metrics is implemented to dynamically adjust app replicas.
 
-Also, in Dockerfile special uvicorn flag "--proxy-headers" is added in its call command.
+Also, in Dockerfile special uvicorn flag `"--proxy-headers"` is added in its call command.
 
 ``` bash
    helm package celsiusify-chart
@@ -201,7 +199,9 @@ Also, in Dockerfile special uvicorn flag "--proxy-headers" is added in its call 
 ```
 
 ![release_kube_dashboard](pictures/release_kube_dashboard_deploy.jpg)
+
 ![release_kube_dashboard_service](pictures/release_kube_dashboard_service.jpg)
+
 ![kube_hpa_terminal](pictures/kube_hpa_terminal.jpg)
 
 When the CPU usage of the pods exceeds the target CPU utilization percentage specified in the Horizontal Pod Autoscaler (HPA) configuration, then the HPA triggers and requests more pods to be created. The HPA communicates with the Kubernetes control plane, which then instructs the Deployment controller to create additional pods.
@@ -214,17 +214,57 @@ Helpful resources:
 
 ## Step 4. Locust for performance testing
 
-**Locust Dockerization**:
+**Locustfile**:
 
-* A Dockerfile is crafted to define the Locust testing environment and scenarios.
+* A locustfile is crafted to define the Locust testing environment and scenarios.
+
+``` python
+   class WebsiteUser(HttpUser):
+      wait_time = between(min_wait=0.005, max_wait=0.1) # in secs
+      host = "http://<cluster_ip>:8080" # service endpoint
+    
+   @task
+   def my_task(self):
+      random_num: float = random.randint(a=0, b=1000) + random.uniform(a=0, b=1)
+      response = self.client.get(f'/convert/?fahrenheit={random_num}')
+      pass
+```
+
+`cluster_ip` should be available through command:
+
+``` bash
+   kubectl get svc
+```
 
 **Helm Chart for Locust Deployment**:
 
 * A Helm chart is created to streamline the deployment of Locust on Kubernetes, facilitating efficient testing.
 
+``` bash
+   kubectl create configmap celsiusify-loadtest-locustfile --from-file locust/main.py  
+   kubectl create configmap celsiusify-loadtest-lib --from-file locust/lib/   
+   helm install locust deliveryhero/locust \ 
+      --set loadtest.name=celsiusify-loadtest \ 
+      --set loadtest.locust_locustfile_configmap=celsiusify-loadtest-locustfile \   
+      --set loadtest.locust_lib_configmap=celsiusify-loadtest-lib 
+   kubectl --namespace default port-forward service/locust 8089:8089
+```
+
+![kube_dashboard_locust](pictures/kube_dashboard_locust.jpg)
+
+![locust_pods_terminal](pictures/locust_pods_terminal.png)
+
 **Execution of Performance Tests**:
 
 * The Locust Helm chart is deployed, initiating performance tests against the FastAPI application.
+
+![locust_fastapi_test](pictures/locust_fastapi_test.jpg)
+
+Helpful resources:
+
+<https://artifacthub.io/packages/helm/deliveryhero/locust>
+<https://docs.locust.io/en/stable/running-in-docker.html#>
+<https://www.youtube.com/watch?v=S2fjd1Q8HiQ>
 
 ## Step 5. CI pipeline implementation
 
