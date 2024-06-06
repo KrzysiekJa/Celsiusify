@@ -12,7 +12,7 @@
 
 ``` bash
    # installation of pyenv (if not installed) -> recommended solution
-   # following instructions from: https://github.com/pyenv/pyenv
+   # after following instructions from: https://github.com/pyenv/pyenv
    curl https://pyenv.run | bash
 
    pyenv install 3.9
@@ -24,7 +24,7 @@
 
    It's achieved thru defining requirements.txt file:
 
-``` plain
+``` bash
    fastapi>=0.68.0,<0.69.0+
    pydantic>=1.8.0,<2.0.0
    uvicorn>=0.15.0,<0.16.0
@@ -53,7 +53,7 @@
       return {"celsius": f'{celsius:.6f}', "app_identifier": app.app_identifier}
 ```
 
-During the initialization phase of the Celsiusify app, a unique identifier is generated, which persists throughout the application's runtime.
+   During the initialization phase of the Celsiusify app, a unique identifier is generated, which persists throughout the application's runtime.
 
 **App Initialization and Runtime**:
 
@@ -64,6 +64,7 @@ During the initialization phase of the Celsiusify app, a unique identifier is ge
 ```
 
 ![celsiusify_api](pictures/celsiusify_api.jpg)
+
 ![celsiusify_api_example](pictures/celsiusify_api_example.jpg)
 
 ## Step 2. Docker image
@@ -115,19 +116,19 @@ During the initialization phase of the Celsiusify app, a unique identifier is ge
    docker push <username>/celsiusify:latest
 ```
 
-Helpful resources:
+   Helpful resources:
 
-<https://fastapi.tiangolo.com/deployment/docker/>
+   <https://fastapi.tiangolo.com/deployment/docker/>
 
 ## Step 3. Helm chart for Celsiusify
 
 **Pre-requirements:**
 
-To complete this step, it is needed to have already installed **kubectl** and **kubernetes** (or [**minikube**](https://minikube.sigs.k8s.io/docs/start/)).
+   To complete this step, it is needed to have already installed **kubectl** and **kubernetes** (or [**minikube**](https://minikube.sigs.k8s.io/docs/start/)).
 
-*Tip*: follow guideness from <https://linuxiac.com/how-to-install-minikube-on-linux/>.
+   *Tip*: follow guideness from <https://linuxiac.com/how-to-install-minikube-on-linux/>.
 
-To commands to start up **minikube** dashboard:
+   To commands to start up **minikube** dashboard:
 
 ``` bash
    minikube start --driver=docker    
@@ -155,7 +156,7 @@ To commands to start up **minikube** dashboard:
    |-- README.md
 ```
 
-Configuration for kubernetes environment is put in  `celsiusify-chart/values.yaml`:
+   Configuration for kubernetes environment is put in  `celsiusify-chart/values.yaml`:
 
 ``` kubernetes
    replicaCount: 1
@@ -180,18 +181,18 @@ Configuration for kubernetes environment is put in  `celsiusify-chart/values.yam
    targetCPUUtilizationPercentage: 50
 ```
 
-The `celsiusify-chart/values.yaml` file configures the deployment of the Celsiusify application in a Kubernetes environment using Helm. It ensures the Celsiusify application is deployed with appropriate scaling and service exposure settings in a Kubernetes environment.
+   The `celsiusify-chart/values.yaml` file configures the deployment of the Celsiusify application in a Kubernetes environment using Helm. It ensures the Celsiusify application is deployed with appropriate scaling and service exposure settings in a Kubernetes environment.
 
 **Configuration of Deployment and Service**:
 
 * Configuration files for deployment (`deployment.yaml`) and service (`service.yaml`) are tailored to meet the app's requirements.
 
-[celsiusify-chart/templates/deployment.yaml](https://github.com/KrzysiekJa/Celsiusify/blob/main/celsiusify-chart/templates/deployment.yaml)  
-[celsiusify-chart/templates/service.yaml](https://github.com/KrzysiekJa/Celsiusify/blob/main/celsiusify-chart/templates/service.yaml)
+   [celsiusify-chart/templates/deployment.yaml](https://github.com/KrzysiekJa/Celsiusify/blob/main/celsiusify-chart/templates/deployment.yaml)  
+   [celsiusify-chart/templates/service.yaml](https://github.com/KrzysiekJa/Celsiusify/blob/main/celsiusify-chart/templates/service.yaml)
 
 * Auto-scaling based on CPU usage metrics is implemented to dynamically adjust app replicas.
 
-Also, in Dockerfile special uvicorn flag `"--proxy-headers"` is added in its call command.
+   Also, in Dockerfile special uvicorn flag `"--proxy-headers"` is added in its call command.
 
 ``` bash
    helm package celsiusify-chart
@@ -204,13 +205,13 @@ Also, in Dockerfile special uvicorn flag `"--proxy-headers"` is added in its cal
 
 ![kube_hpa_terminal](pictures/kube_hpa_terminal.jpg)
 
-When the CPU usage of the pods exceeds the target CPU utilization percentage specified in the Horizontal Pod Autoscaler (HPA) configuration, then the HPA triggers and requests more pods to be created. The HPA communicates with the Kubernetes control plane, which then instructs the Deployment controller to create additional pods.
+   When the CPU usage of the pods exceeds the target CPU utilization percentage specified in the Horizontal Pod Autoscaler (HPA) configuration, then the HPA triggers and requests more pods to be created. The HPA communicates with the Kubernetes control plane, which then instructs the Deployment controller to create additional pods.
 
-Helpful resources:
+   Helpful resources:
 
-<https://tamerlan.dev/load-balancing-in-kubernetes-a-step-by-step-guide/>  
-<https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/>  
-<https://kubernetes.io/docs/tasks/debug/debug-application/debug-service/>  
+   <https://tamerlan.dev/load-balancing-in-kubernetes-a-step-by-step-guide/>  
+   <https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/>  
+   <https://kubernetes.io/docs/tasks/debug/debug-application/debug-service/>  
 
 ## Step 4. Locust for performance testing
 
@@ -230,7 +231,7 @@ Helpful resources:
       pass
 ```
 
-`cluster_ip` address should be available through command:
+   `cluster_ip` address should be available through command:
 
 ``` bash
    kubectl get svc
@@ -240,7 +241,7 @@ Helpful resources:
 
 * A Helm chart is created to streamline the deployment of Locust on Kubernetes, facilitating efficient testing.
 
-Commands listed below perform installation of the Locust Helm chart from the `deliveryhero/locust` repository, with specific configuration settings for the load testing.
+   Commands listed below perform installation of the Locust Helm chart from the `deliveryhero/locust` repository, with specific configuration settings for the load testing.
 
 ``` bash
    kubectl create configmap celsiusify-loadtest-locustfile --from-file locust/main.py  
@@ -252,7 +253,7 @@ Commands listed below perform installation of the Locust Helm chart from the `de
    kubectl --namespace default port-forward service/locust 8089:8089
 ```
 
-By using a Helm chart, the deployment of Locust on Kubernetes is streamlined, making it easier to manage the lifecycle of the load testing application. Helm charts provide a standardized way to package, configure, and deploy Kubernetes applications, simplifying the process of setting up and running Locust for load testing purposes.
+   By using a Helm chart, the deployment of Locust on Kubernetes is streamlined, making it easier to manage the lifecycle of the load testing application. Helm charts provide a standardized way to package, configure, and deploy Kubernetes applications, simplifying the process of setting up and running Locust for load testing purposes.
 
 ![kube_dashboard_locust](pictures/kube_dashboard_locust.jpg)
 
@@ -262,15 +263,15 @@ By using a Helm chart, the deployment of Locust on Kubernetes is streamlined, ma
 
 * The Locust chart is deployed, initiating performance test against the Celsiusify.
 
-Test is been conducted for 5 minutes for 100 users, with spawn rate of 100. Below, test statistics are gathered on plots:
+   Test is been conducted for 5 minutes for 100 users, with spawn rate of 100. Below, test statistics are gathered on plots:
 
 ![locust_celsiusify_plots](pictures/locust_celsiusify_plots.png)
 
-Helpful resources:
+   Helpful resources:
 
-<https://artifacthub.io/packages/helm/deliveryhero/locust>  
-<https://docs.locust.io/en/stable/running-in-docker.html#>  
-<https://www.youtube.com/watch?v=S2fjd1Q8HiQ>
+   <https://artifacthub.io/packages/helm/deliveryhero/locust>  
+   <https://docs.locust.io/en/stable/running-in-docker.html#>  
+   <https://www.youtube.com/watch?v=S2fjd1Q8HiQ>
 
 ## Step 5. CI pipeline implementation
 
