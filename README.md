@@ -38,7 +38,7 @@
 
 * A FastAPI application is developed, featuring an endpoint designed to convert temperatures from Fahrenheit to Celsius degrees:
 
-``` python3
+``` python
    app = FastAPI(title='Celsiusify')
 
    @app.on_event("startup")
@@ -216,7 +216,7 @@ Helpful resources:
 
 **Locustfile**:
 
-* A locustfile is crafted to define the Locust testing environment and scenarios.
+* A `locustfile` is crafted to define the Locust testing environment and scenarios. Below is shown code of mentioned file:
 
 ``` python
    class WebsiteUser(HttpUser):
@@ -230,7 +230,7 @@ Helpful resources:
       pass
 ```
 
-`cluster_ip` should be available through command:
+`cluster_ip` address should be available through command:
 
 ``` bash
    kubectl get svc
@@ -239,6 +239,8 @@ Helpful resources:
 **Helm Chart for Locust Deployment**:
 
 * A Helm chart is created to streamline the deployment of Locust on Kubernetes, facilitating efficient testing.
+
+Commands listed below perform installation of the Locust Helm chart from the `deliveryhero/locust` repository, with specific configuration settings for the load testing.
 
 ``` bash
    kubectl create configmap celsiusify-loadtest-locustfile --from-file locust/main.py  
@@ -250,20 +252,24 @@ Helpful resources:
    kubectl --namespace default port-forward service/locust 8089:8089
 ```
 
+By using a Helm chart, the deployment of Locust on Kubernetes is streamlined, making it easier to manage the lifecycle of the load testing application. Helm charts provide a standardized way to package, configure, and deploy Kubernetes applications, simplifying the process of setting up and running Locust for load testing purposes.
+
 ![kube_dashboard_locust](pictures/kube_dashboard_locust.jpg)
 
 ![locust_pods_terminal](pictures/locust_pods_terminal.png)
 
-**Execution of Performance Tests**:
+**Execution of Performance Test**:
 
-* The Locust Helm chart is deployed, initiating performance tests against the FastAPI application.
+* The Locust chart is deployed, initiating performance test against the Celsiusify.
 
-![locust_fastapi_test](pictures/locust_fastapi_test.jpg)
+Test is been conducted for 5 minutes for 100 users, with spawn rate of 100. Below, test statistics are gathered on plots:
+
+![locust_celsiusify_plots](pictures/locust_celsiusify_plots.png)
 
 Helpful resources:
 
-<https://artifacthub.io/packages/helm/deliveryhero/locust>
-<https://docs.locust.io/en/stable/running-in-docker.html#>
+<https://artifacthub.io/packages/helm/deliveryhero/locust>  
+<https://docs.locust.io/en/stable/running-in-docker.html#>  
 <https://www.youtube.com/watch?v=S2fjd1Q8HiQ>
 
 ## Step 5. CI pipeline implementation
