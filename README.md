@@ -2,7 +2,7 @@
 
 ### DevOps (MLOps) benchmark project
 
-**DevOps** (Development and Operations) work on tasks that **bridge** the gap between software development and IT operations teams.
+   **DevOps** (Development and Operations) work on tasks that **bridge** the gap between software development and IT operations teams.
 
 ## Step 1. Backend web application
 
@@ -277,8 +277,85 @@
 
 **Pipeline Configuration**:
 
-* A CI pipeline is established utilizing tools like **GitHub Actions** or Jenkins.
-* Stages within the pipeline are configured to encompass linting, testing, Docker image building, Docker Hub pushing, and Helm chart syntax validation.
+* A CI pipeline is established utilizing **GitHub Actions** tool.
+
+   Stages within the pipeline are configured to encompass linting, testing, Docker image building, Docker Hub pushing, and Helm chart syntax validation:
+
+``` github workflows
+   name: CI
+
+   on:
+   push:
+      branches:
+         - main
+
+   jobs:
+   lint:
+      name: Linting
+      runs-on: ubuntu-latest
+      steps:
+         - name: Checkout code
+         uses: actions/checkout@v2
+
+         - name: Install Python
+         uses: actions/setup-python@v2
+         with:
+            python-version: 3.9
+         
+         - name: Install dependencies
+         run: pip install -r requirements.txt
+
+         - name: Install dependencies
+         run: pip install pylint
+
+         - name: Run pylint
+         run: pylint app/main.py
+
+   test:
+      name: Testing
+      runs-on: ubuntu-latest
+      steps:
+         - name: Checkout code
+         uses: actions/checkout@v2
+
+         - name: Install Docker
+         uses: docker/setup-buildx-action@v1
+
+         - name: Build Docker Image
+         run: docker build -t celsiusify:latest .
+
+   push:
+      name: Push Docker Image
+      runs-on: ubuntu-latest
+      steps:
+         - name: Checkout code
+         uses: actions/checkout@v2
+         
+         - name: Build Docker Image
+         run: docker build -t "${{ secrets.DOCKERHUB_USERNAME }}/celsiusify:latest" .
+
+         - name: Log in to Docker Hub
+         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+         - name: Push Docker Image
+         run: docker push "${{ secrets.DOCKERHUB_USERNAME }}"/celsiusify:latest
+
+   helm:
+      name: Helm Chart Syntax Check
+      runs-on: ubuntu-latest
+      steps:
+         - name: Checkout code
+         uses: actions/checkout@v2
+
+         - name: Install Helm
+         run: |
+            curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+            chmod +x get_helm.sh
+            ./get_helm.sh
+
+         - name: Helm Chart Lint
+         run: helm lint ./celsiusify-chart
+```
 
 ## Step 6. TensorFlow model with TensorFlow Serving
 
