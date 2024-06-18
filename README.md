@@ -2,7 +2,7 @@
 
 ### DevOps (MLOps) benchmark project
 
-   **DevOps** (Development and Operations) work on tasks that **bridge** the gap between software development and IT operations teams.
+**DevOps** (Development and Operations) work on tasks that **bridge** the gap between software development and IT operations teams.
 
 ## Step 1. Backend web application
 
@@ -116,19 +116,19 @@
    docker push <username>/celsiusify:latest
 ```
 
-   Helpful resources:
+Helpful resources:
 
-   <https://fastapi.tiangolo.com/deployment/docker/>
+<https://fastapi.tiangolo.com/deployment/docker/>
 
 ## Step 3. Helm chart for Celsiusify
 
 **Pre-requirements:**
 
-   To complete this step, it is needed to have already installed **kubectl** and **kubernetes** (or [**minikube**](https://minikube.sigs.k8s.io/docs/start/)).
+To complete this step, it is needed to have already installed **kubectl** and **kubernetes** (or [**minikube**](https://minikube.sigs.k8s.io/docs/start/)).
 
-   *Tip*: follow guideness from <https://linuxiac.com/how-to-install-minikube-on-linux/>.
+*Tip*: follow guideness from <https://linuxiac.com/how-to-install-minikube-on-linux/>.
 
-   To commands to start up **minikube** dashboard:
+To commands to start up **minikube** dashboard:
 
 ``` bash
    minikube start --driver=docker    
@@ -156,7 +156,7 @@
    |-- README.md
 ```
 
-   Configuration for kubernetes environment is put in  `celsiusify-chart/values.yaml`:
+Configuration for kubernetes environment is put in  `celsiusify-chart/values.yaml`:
 
 ``` kubernetes
    replicaCount: 1
@@ -181,7 +181,7 @@
    targetCPUUtilizationPercentage: 50
 ```
 
-   The `celsiusify-chart/values.yaml` file configures the deployment of the Celsiusify application in a Kubernetes environment using Helm. It ensures the Celsiusify application is deployed with appropriate scaling and service exposure settings in a Kubernetes environment.
+The `celsiusify-chart/values.yaml` file configures the deployment of the Celsiusify application in a Kubernetes environment using Helm. It ensures the Celsiusify application is deployed with appropriate scaling and service exposure settings in a Kubernetes environment.
 
 **Configuration of Deployment and Service**:
 
@@ -205,13 +205,13 @@
 
 ![kube_hpa_terminal](pictures/kube_hpa_terminal.jpg)
 
-   When the CPU usage of the pods exceeds the target CPU utilization percentage specified in the Horizontal Pod Autoscaler (HPA) configuration, then the HPA triggers and requests more pods to be created. The HPA communicates with the Kubernetes control plane, which then instructs the Deployment controller to create additional pods.
+When the CPU usage of the pods exceeds the target CPU utilization percentage specified in the Horizontal Pod Autoscaler (HPA) configuration, then the HPA triggers and requests more pods to be created. The HPA communicates with the Kubernetes control plane, which then instructs the Deployment controller to create additional pods.
 
-   Helpful resources:
+Helpful resources:
 
-   <https://tamerlan.dev/load-balancing-in-kubernetes-a-step-by-step-guide/>  
-   <https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/>  
-   <https://kubernetes.io/docs/tasks/debug/debug-application/debug-service/>  
+<https://tamerlan.dev/load-balancing-in-kubernetes-a-step-by-step-guide/>  
+<https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/>  
+<https://kubernetes.io/docs/tasks/debug/debug-application/debug-service/>  
 
 ## Step 4. Locust for performance testing
 
@@ -253,7 +253,7 @@
    kubectl --namespace default port-forward service/locust 8089:8089
 ```
 
-   By using a Helm chart, the deployment of Locust on Kubernetes is streamlined, making it easier to manage the lifecycle of the load testing application. Helm charts provide a standardized way to package, configure, and deploy Kubernetes applications, simplifying the process of setting up and running Locust for load testing purposes.
+By using a Helm chart, the deployment of Locust on Kubernetes is streamlined, making it easier to manage the lifecycle of the load testing application. Helm charts provide a standardized way to package, configure, and deploy Kubernetes applications, simplifying the process of setting up and running Locust for load testing purposes.
 
 ![kube_dashboard_locust](pictures/kube_dashboard_locust.jpg)
 
@@ -267,11 +267,11 @@
 
 ![locust_celsiusify_plots](pictures/locust_celsiusify_plots.png)
 
-   Helpful resources:
+Helpful resources:
 
-   <https://artifacthub.io/packages/helm/deliveryhero/locust>  
-   <https://docs.locust.io/en/stable/running-in-docker.html#>  
-   <https://www.youtube.com/watch?v=S2fjd1Q8HiQ>
+<https://artifacthub.io/packages/helm/deliveryhero/locust>  
+<https://docs.locust.io/en/stable/running-in-docker.html#>  
+<https://www.youtube.com/watch?v=S2fjd1Q8HiQ>
 
 ## Step 5. CI pipeline implementation
 
@@ -281,7 +281,7 @@
 
    Stages within the pipeline are configured to encompass linting, testing, Docker image building, Docker Hub pushing, and Helm chart syntax validation:
 
-``` github workflows
+``` yaml
    name: CI
 
    on:
@@ -355,6 +355,38 @@
 
          - name: Helm Chart Lint
          run: helm lint ./celsiusify-chart
+```
+
+* To proceed with setting up secrets for Docker Hub authentication in GitHub Actions, consecutive steps need to be followed:
+
+   **Create Docker Hub Access Token**:  
+      Log in to your Docker Hub account.  
+      Navigate to *Account Settings > Security > New Access Token*.  
+      Give your token a description and select the necessary permissions (e.g. write access for pushing images).  
+      Click *Create* and copy the generated token. Note: Once you navigate away from this page, you won't be able to access the token again.
+
+   **Add Docker Hub Username Secret**:  
+      In your GitHub repository, go to *Settings > Secrets and variables > Actions > New repository secret*.  
+      Enter `DOCKERHUB_USERNAME` as the name and your Docker Hub username as the value.  
+      Click *Add secret*.
+
+   **Add Docker Hub Token Secret**:  
+      In your GitHub repository, go to *Settings > Secrets and variables > Actions > New repository secret*.  
+      Enter `DOCKERHUB_TOKEN` as the name and paste the Docker Hub access token as the value.  
+      Click *Add secret*.
+
+   **Modify GitHub Actions Workflow**:  
+      In your GitHub Actions workflow (`ci.yml`), update the Docker login step to use the secrets:
+
+``` yaml
+         - name: Build Docker Image
+         run: docker build -t "${{ secrets.DOCKERHUB_USERNAME }}/celsiusify:latest" .
+
+         - name: Log in to Docker Hub
+         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+         - name: Push Docker Image
+         run: docker push "${{ secrets.DOCKERHUB_USERNAME }}"/celsiusify:latest
 ```
 
 ## Step 6. TensorFlow model with TensorFlow Serving
