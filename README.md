@@ -401,13 +401,61 @@ Helpful resources:
 
 * A Dockerfile is authored to bundle TensorFlow Serving alongside the TensorFlow model files.
 
+``` docker
+   FROM tensorflow/serving:latest
+
+   ENV MODEL_BASE_PATH=/models
+   ENV MODEL_VERSION=/1/
+   ENV MODEL_NAME=saved_model
+
+   RUN mkdir -p ${MODEL_BASE_PATH}${MODEL_VERSION}
+
+   COPY . ${MODEL_BASE_PATH}${MODEL_VERSION}
+
+   EXPOSE 8501
+
+   RUN echo '#!/bin/bash \n\n\
+   tensorflow_model_server --rest_api_port=8501 \
+   --model_name=${MODEL_NAME} --model_base_path=${MODEL_BASE_PATH} \
+   "$@"' > /usr/bin/tf_serving_entrypoint.sh \
+   && chmod +x /usr/bin/tf_serving_entrypoint.sh
+
+   ENTRYPOINT ["/usr/bin/tf_serving_entrypoint.sh"]
+```
+
+``` bash
+   cd model
+   docker build -t <username>/tf-serving-model-minimal .
+   docker run -p 8501:8501 --name tf-serving-model-container <username>/tf-serving-model-minimal
+   sudo lsof -nP -i | grep LISTEN (or sudo lsof -nP -iTCP -sTCP:LISTEN)
+```
+
+``` bash
+   curl -d '{"instances": [80.0, 90.0, 451]}' -X POST http://localhost:8501/v1/models/saved_model:predict
+```
+
 **Helm Chart Adjustment**:
 
 * The Helm chart is updated to facilitate the deployment of the TensorFlow Serving image.
 
+``` bash
+   helm package tf-serving-chart
+   helm upgrade -i tf-serving-model tf-serving-model-release-0.1.0.tgz
+```
+
 **Performance Testing Incorporation**:
 
 * The performance tests conducted with Locust are replicated with the TensorFlow Serving deployment to gauge its efficiency.
+
+``` bash
+   kubectl create configmap tf-serving-loadtest-locustfile --from-file locust/main.py
+   kubectl create configmap tf-serving-loadtest-lib --from-file locust/lib/
+   helm install locust deliveryhero/locust \
+      --set loadtest.name=tf-serving-loadtest \
+      --set loadtest.locust_locustfile_configmap=tf-serving-loadtest-locustfile \
+      --set loadtest.locust_lib_configmap=tf-serving-loadtest-lib
+    kubectl --namespace default port-forward service/locust 8089:8089
+```
 
 ## Step 7. Statistics files and report
 
