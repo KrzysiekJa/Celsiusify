@@ -357,26 +357,28 @@ Helpful resources:
          run: helm lint ./celsiusify-chart
 ```
 
+![github_actions_dashboard](pictures/github_actions_dashboard.jpg)
+
 * To proceed with setting up secrets for Docker Hub authentication in GitHub Actions, consecutive steps need to be followed:
 
    **Create Docker Hub Access Token**:  
-      Log in to your Docker Hub account.  
+      Log in to Docker Hub account.  
       Navigate to *Account Settings > Security > New Access Token*.  
-      Give your token a description and select the necessary permissions (e.g. write access for pushing images).  
+      Give token a description and select the necessary permissions (e.g. write access for pushing images).  
       Click *Create* and copy the generated token. Note: Once you navigate away from this page, you won't be able to access the token again.
 
    **Add Docker Hub Username Secret**:  
-      In your GitHub repository, go to *Settings > Secrets and variables > Actions > New repository secret*.  
-      Enter `DOCKERHUB_USERNAME` as the name and your Docker Hub username as the value.  
+      In GitHub repository go to *Settings > Secrets and variables > Actions > New repository secret*.  
+      Enter `DOCKERHUB_USERNAME` as the name and Docker Hub username as the value.  
       Click *Add secret*.
 
    **Add Docker Hub Token Secret**:  
-      In your GitHub repository, go to *Settings > Secrets and variables > Actions > New repository secret*.  
+      In GitHub repository go to *Settings > Secrets and variables > Actions > New repository secret*.  
       Enter `DOCKERHUB_TOKEN` as the name and paste the Docker Hub access token as the value.  
       Click *Add secret*.
 
    **Modify GitHub Actions Workflow**:  
-      In your GitHub Actions workflow (`ci.yml`), update the Docker login step to use the secrets:
+      In GitHub Actions workflow (`ci.yml`) update the Docker login step to use the secrets:
 
 ``` yaml
          - name: Build Docker Image
@@ -388,6 +390,10 @@ Helpful resources:
          - name: Push Docker Image
          run: docker push "${{ secrets.DOCKERHUB_USERNAME }}"/celsiusify:latest
 ```
+
+`Log in to Docker Hub`' run command retrieves the Docker Hub username and token from the secrets and logs in to Docker Hub using them.
+
+* Once secrets have been added and the workflow has been updated, changes need to be committed and pushed to your GitHub repository.
 
 ## Step 6. TensorFlow model with TensorFlow Serving
 
