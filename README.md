@@ -141,7 +141,7 @@ To commands to start up **minikube** dashboard:
 
 * A directory structure is established for the Helm chart, incorporating essential templates and values files. Below is shown celsiusify-chart directory structure:
 
-``` directory
+``` dir
    /my_project
    |-- /app
    |   |-- main.py
@@ -158,7 +158,7 @@ To commands to start up **minikube** dashboard:
 
 Configuration for kubernetes environment is put in  `celsiusify-chart/values.yaml`:
 
-``` kubernetes
+``` yaml
    replicaCount: 1
    app:
    name: celsiusify
@@ -224,11 +224,11 @@ Helpful resources:
       wait_time = between(min_wait=0.005, max_wait=0.1) # in secs
       host = "http://<cluster_ip>:8080" # service endpoint
     
-   @task
-   def my_task(self):
-      random_num: float = random.randint(a=0, b=1000) + random.uniform(a=0, b=1)
-      response = self.client.get(f'/convert/?fahrenheit={random_num}')
-      pass
+      @task
+      def my_task(self):
+         random_num: float = random.randint(a=0, b=1000) + random.uniform(a=0, b=1)
+         response = self.client.get(f'/convert/?fahrenheit={random_num}')
+         pass
 ```
 
    `cluster_ip` address should be available through command:
@@ -401,7 +401,7 @@ Helpful resources:
 
 * A Dockerfile is authored to bundle TensorFlow Serving alongside the TensorFlow model files.
 
-``` docker
+``` dockerfile
    FROM tensorflow/serving:latest
 
    ENV MODEL_BASE_PATH=/models
