@@ -367,7 +367,7 @@ Helpful resources:
       Give token a description and select the necessary permissions (e.g. write access for pushing images).  
       Click *Create* and copy the generated token. Note: Once you navigate away from this page, you won't be able to access the token again.
 
-   **Add Docker Hub Username Secret**:  
+   **Add Docker Hub Username Secret**:
       In GitHub repository go to *Settings > Secrets and variables > Actions > New repository secret*.  
       Enter `DOCKERHUB_USERNAME` as the name and Docker Hub username as the value.  
       Click *Add secret*.
@@ -399,7 +399,7 @@ Helpful resources:
 
 **TensorFlow Serving Docker Image Creation**:
 
-* A Dockerfile is authored to bundle TensorFlow Serving alongside the TensorFlow model files.
+* A Dockerfile is authored to bundle TensorFlow Serving alongside the TensorFlow model files. This is done to facilitate the use of the model for prediction purposes.
 
 ``` dockerfile
    FROM tensorflow/serving:latest
@@ -423,20 +423,32 @@ Helpful resources:
    ENTRYPOINT ["/usr/bin/tf_serving_entrypoint.sh"]
 ```
 
+The above Dockerfile is used to create a Docker image of TensorFlow Serving with the model files included. It solves the problem of needing to install TensorFlow Serving and the model files on a machine, which can be a time-consuming and error-prone process.
+
+The below picture shows command, which is useful to check the structure of the TF Serving model metagraph.
+
+![tfs-model_metagraph](pictures/tfs-model_metagraph.jpg)
+
+Following bash commands are used to build the Docker image, run the container, and check that the container is listening on port 8501.
+
 ``` bash
    cd model
    docker build -t <username>/tf-serving-model-minimal .
    docker run -p 8501:8501 --name tf-serving-model-container <username>/tf-serving-model-minimal
-   sudo lsof -nP -i | grep LISTEN (or sudo lsof -nP -iTCP -sTCP:LISTEN)
+   sudo lsof -nP -i | grep LISTEN # (or sudo lsof -nP -iTCP -sTCP:LISTEN)
 ```
+
+Below, the `curl` command is used to send a POST request with a JSON payload containing an array of temperatures in Fahrenheit to checkout if the TF Serving container is responding correctly.
 
 ``` bash
    curl -d '{"instances": [80.0, 90.0, 451]}' -X POST http://localhost:8501/v1/models/saved_model:predict
 ```
 
+![tf-serving_model_response](pictures/tf-serving_model_response.jpg)
+
 **Helm Chart Adjustment**:
 
-* The Helm chart is updated to facilitate the deployment of the TensorFlow Serving image.
+* The Helm chart is copied to the `model/` directory and updated to facilitate the deployment of the TF Serving image. Then, to deploy the Helm chart with the updated image, the following commands are used:
 
 ``` bash
    helm package tf-serving-chart
@@ -445,7 +457,7 @@ Helpful resources:
 
 **Performance Testing Incorporation**:
 
-* The performance tests conducted with Locust are replicated with the TensorFlow Serving deployment to gauge its efficiency.
+* The performance tests conducted with Locust are replicated with the TensorFlow Serving deployment to gauge its efficiency. The following commands are used to deploy the Locust chart and configure it to test the TF Serving deployment. The `locust/main.py` file is used to define the Locust test scenarios and the `locust/lib/` directory contains any helper files that may be required.
 
 ``` bash
    kubectl create configmap tf-serving-loadtest-locustfile --from-file locust/main.py
