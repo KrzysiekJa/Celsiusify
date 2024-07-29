@@ -11,13 +11,13 @@
 * A new directory is created for the Celsiusify project, and within it, a **Python 3.9** virtual environment (.venv) is set up (of course, it's possible to use newer Python, but in case if FastAPI would cooperate with it).
 
 ``` bash
-   # installation of pyenv (if not installed) -> recommended solution
-   # after following instructions from: https://github.com/pyenv/pyenv
-   curl https://pyenv.run | bash
+# installation of pyenv (if not installed) -> recommended solution
+# after following instructions from: https://github.com/pyenv/pyenv
+curl https://pyenv.run | bash
 
-   pyenv install 3.9
-   pyenv virtualenv 3.9 celsiusify
-   pyenv activate celsiusify
+pyenv install 3.9
+pyenv virtualenv 3.9 celsiusify
+pyenv activate celsiusify
 ```
 
 * FastAPI and Uvicorn are installed using **pip** to facilitate the creation of the web app.
@@ -25,13 +25,13 @@
    It's achieved thru defining requirements.txt file:
 
 ``` bash
-   fastapi>=0.68.0,<0.69.0+
-   pydantic>=1.8.0,<2.0.0
-   uvicorn>=0.15.0,<0.16.0
+fastapi>=0.68.0,<0.69.0+
+pydantic>=1.8.0,<2.0.0
+uvicorn>=0.15.0,<0.16.0
 ```
 
 ``` bash
-   pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 **API Endpoint Development**:
@@ -39,18 +39,18 @@
 * A FastAPI application is developed, featuring an endpoint designed to convert temperatures from Fahrenheit to Celsius degrees:
 
 ``` python
-   app = FastAPI(title='Celsiusify')
+app = FastAPI(title='Celsiusify')
 
-   @app.on_event("startup")
-   async def startup_event() -> None:
-      string_len, constants_str = 8, string.ascii_letters + string.digits
-      list_of_ids = [''.join(random.choices(constants_str, k=string_len)) for _ in range(stop=4)]
-      app.app_identifier = '-'.join(list_of_ids)
+@app.on_event("startup")
+async def startup_event() -> None:
+   string_len, constants_str = 8, string.ascii_letters + string.digits
+   list_of_ids = [''.join(random.choices(constants_str, k=string_len)) for _ in range(stop=4)]
+   app.app_identifier = '-'.join(list_of_ids)
 
-   @app.get("/convert/")
-   async def convert_temperature(fahrenheit: float) -> Dict[str, str]:
-      celsius = (fahrenheit - 32) * 5.0/9.0
-      return {"celsius": f'{celsius:.6f}', "app_identifier": app.app_identifier}
+@app.get("/convert/")
+async def convert_temperature(fahrenheit: float) -> Dict[str, str]:
+   celsius = (fahrenheit - 32) * 5.0/9.0
+   return {"celsius": f'{celsius:.6f}', "app_identifier": app.app_identifier}
 ```
 
    During the initialization phase of the Celsiusify app, a unique identifier is generated, which persists throughout the application's runtime.
@@ -60,7 +60,7 @@
 * Application can be run thanks to Uvicorn server starting with following command:
 
 ``` bash
-   uvicorn app.main:app --host 0.0.0.0 --port 80
+uvicorn app.main:app --host 0.0.0.0 --port 80
 ```
 
 ![celsiusify_api](pictures/celsiusify_api.jpg)
@@ -78,19 +78,19 @@
 * Written Dockerfile includes instructions for installing dependencies, copying necessary files, and exposing the required port *80*.
 
 ``` dockerfile
-   FROM python:3.9-slim
-   # environment variable
-   ENV PYTHONUNBUFFERED 1
+FROM python:3.9-slim
+# environment variable
+ENV PYTHONUNBUFFERED 1
 
-   WORKDIR /code
+WORKDIR /code
 
-   COPY ./requirements.txt /code/requirements.txt
+COPY ./requirements.txt /code/requirements.txt
 
-   RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
-   COPY ./app /code/app
+COPY ./app /code/app
 
-   CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
 ```
 
 **Building Docker Image**:
@@ -98,9 +98,9 @@
 * Locally, the Docker image is constructed and on that way tested to ensure proper functionality and adherence to expectations.
 
 ``` bash
-   docker build -t celsiusify:latest .
-   docker images
-   docker run --name celsiusify-container -p 80:80 celsiusify:latest
+docker build -t celsiusify:latest .
+docker images
+docker run --name celsiusify-container -p 80:80 celsiusify:latest
 ```
 
 ![work_of_image](pictures/work_of_image.png)
@@ -109,11 +109,11 @@
 
 **Pushing to DockerHub**:
 
-* At the end of this step, a good solution is to rely on DockerHub to push the image there using platform account.
+* At the end of ths step, a good solution is to rely on DockerHub to push the image there using platform account.
 
 ``` bash
-   docker tag celsiusify:latest <username>/celsiusify:latest
-   docker push <username>/celsiusify:latest
+docker tag celsiusify:latest <username>/celsiusify:latest
+docker push <username>/celsiusify:latest
 ```
 
 Helpful resources:
@@ -131,10 +131,10 @@ To complete this step, it is needed to have already installed **kubectl** and **
 To commands to start up **minikube** dashboard:
 
 ``` bash
-   minikube start --driver=docker    
-   minikube addons enable metrics-server   
-   minikube addons enable dashboard  
-   minikube dashboard   
+minikube start --driver=docker    
+minikube addons enable metrics-server   
+minikube addons enable dashboard  
+minikube dashboard   
 ```
 
 **Chart Structure Setup**:
@@ -159,26 +159,26 @@ To commands to start up **minikube** dashboard:
 Configuration for kubernetes environment is put in  `celsiusify-chart/values.yaml`:
 
 ``` yaml
-   replicaCount: 1
-   app:
-   name: celsiusify
-   namespace: default
-   image:
-   name: celsiusify
-   tag: latest
-   owner: <dockerhub-username>
-   pullPolicy: IfNotPresent
-   container:
-   name: celsiusify-container
-   service:
-   type: ClusterIP
-   port: 8080
-   targetPort: 80
-   autoscaling:
-   enabled: true
-   minReplicas: 1
-   maxReplicas: 5
-   targetCPUUtilizationPercentage: 50
+replicaCount: 1
+app:
+name: celsiusify
+namespace: default
+image:
+name: celsiusify
+tag: latest
+owner: <dockerhub-username>
+pullPolicy: IfNotPresent
+container:
+name: celsiusify-container
+service:
+type: ClusterIP
+port: 8080
+targetPort: 80
+autoscaling:
+enabled: true
+minReplicas: 1
+maxReplicas: 5
+targetCPUUtilizationPercentage: 50
 ```
 
 The `celsiusify-chart/values.yaml` file configures the deployment of the Celsiusify application in a Kubernetes environment using Helm. It ensures the Celsiusify application is deployed with appropriate scaling and service exposure settings in a Kubernetes environment.
@@ -195,8 +195,8 @@ The `celsiusify-chart/values.yaml` file configures the deployment of the Celsius
    Also, in Dockerfile special uvicorn flag `"--proxy-headers"` is added in its call command.
 
 ``` bash
-   helm package celsiusify-chart
-   helm upgrade -i celsiusify ./celsiusify-release-0.1.0.tgz
+helm package celsiusify-chart
+helm upgrade -i celsiusify ./celsiusify-release-0.1.0.tgz
 ```
 
 ![release_kube_dashboard](pictures/release_kube_dashboard_deploy.jpg)
@@ -220,21 +220,21 @@ Helpful resources:
 * A `locustfile` is crafted to define the Locust testing environment and scenarios. Below is shown code of mentioned file:
 
 ``` python
-   class WebsiteUser(HttpUser):
-      wait_time = between(min_wait=0.005, max_wait=0.1) # in secs
-      host = "http://<cluster_ip>:8080" # service endpoint
-    
-      @task
-      def my_task(self):
-         random_num: float = random.randint(a=0, b=1000) + random.uniform(a=0, b=1)
-         response = self.client.get(f'/convert/?fahrenheit={random_num}')
-         pass
+class WebsiteUser(HttpUser):
+   wait_time = between(min_wait=0.005, max_wait=0.1) # in secs
+   host = "http://<cluster_ip>:8080" # service endpoint
+   
+   @task
+   def my_task(self):
+      random_num: float = random.randint(a=0, b=1000) + random.uniform(a=0, b=1)
+      response = self.client.get(f'/convert/?fahrenheit={random_num}')
+      pass
 ```
 
    `cluster_ip` address should be available through command:
 
 ``` bash
-   kubectl get svc
+kubectl get svc
 ```
 
 **Helm Chart for Locust Deployment**:
@@ -244,13 +244,13 @@ Helpful resources:
    Commands listed below perform installation of the Locust Helm chart from the `deliveryhero/locust` repository, with specific configuration settings for the load testing.
 
 ``` bash
-   kubectl create configmap celsiusify-loadtest-locustfile --from-file locust/main.py  
-   kubectl create configmap celsiusify-loadtest-lib --from-file locust/lib/   
-   helm install locust deliveryhero/locust \ 
-      --set loadtest.name=celsiusify-loadtest \ 
-      --set loadtest.locust_locustfile_configmap=celsiusify-loadtest-locustfile \   
-      --set loadtest.locust_lib_configmap=celsiusify-loadtest-lib 
-   kubectl --namespace default port-forward service/locust 8089:8089
+kubectl create configmap celsiusify-loadtest-locustfile --from-file locust/main.py  
+kubectl create configmap celsiusify-loadtest-lib --from-file locust/lib/   
+helm install locust deliveryhero/locust \ 
+   --set loadtest.name=celsiusify-loadtest \ 
+   --set loadtest.locust_locustfile_configmap=celsiusify-loadtest-locustfile \   
+   --set loadtest.locust_lib_configmap=celsiusify-loadtest-lib 
+kubectl --namespace default port-forward service/locust 8089:8089
 ```
 
 By using a Helm chart, the deployment of Locust on Kubernetes is streamlined, making it easier to manage the lifecycle of the load testing application. Helm charts provide a standardized way to package, configure, and deploy Kubernetes applications, simplifying the process of setting up and running Locust for load testing purposes.
@@ -282,79 +282,79 @@ Helpful resources:
    Stages within the pipeline are configured to encompass linting, testing, Docker image building, Docker Hub pushing, and Helm chart syntax validation:
 
 ``` yaml
-   name: CI
+name: CI
 
-   on:
-   push:
-      branches:
-         - main
+on:
+push:
+   branches:
+      - main
 
-   jobs:
-   lint:
-      name: Linting
-      runs-on: ubuntu-latest
-      steps:
-         - name: Checkout code
-         uses: actions/checkout@v2
+jobs:
+lint:
+   name: Linting
+   runs-on: ubuntu-latest
+   steps:
+      - name: Checkout code
+      uses: actions/checkout@v2
 
-         - name: Install Python
-         uses: actions/setup-python@v2
-         with:
-            python-version: 3.9
-         
-         - name: Install dependencies
-         run: pip install -r requirements.txt
+      - name: Install Python
+      uses: actions/setup-python@v2
+      with:
+         python-version: 3.9
+      
+      - name: Install dependencies
+      run: pip install -r requirements.txt
 
-         - name: Install dependencies
-         run: pip install pylint
+      - name: Install dependencies
+      run: pip install pylint
 
-         - name: Run pylint
-         run: pylint app/main.py
+      - name: Run pylint
+      run: pylint app/main.py
 
-   test:
-      name: Testing
-      runs-on: ubuntu-latest
-      steps:
-         - name: Checkout code
-         uses: actions/checkout@v2
+test:
+   name: Testing
+   runs-on: ubuntu-latest
+   steps:
+      - name: Checkout code
+      uses: actions/checkout@v2
 
-         - name: Install Docker
-         uses: docker/setup-buildx-action@v1
+      - name: Install Docker
+      uses: docker/setup-buildx-action@v1
 
-         - name: Build Docker Image
-         run: docker build -t celsiusify:latest .
+      - name: Build Docker Image
+      run: docker build -t celsiusify:latest .
 
-   push:
-      name: Push Docker Image
-      runs-on: ubuntu-latest
-      steps:
-         - name: Checkout code
-         uses: actions/checkout@v2
-         
-         - name: Build Docker Image
-         run: docker build -t "${{ secrets.DOCKERHUB_USERNAME }}/celsiusify:latest" .
+push:
+   name: Push Docker Image
+   runs-on: ubuntu-latest
+   steps:
+      - name: Checkout code
+      uses: actions/checkout@v2
+      
+      - name: Build Docker Image
+      run: docker build -t "${{ secrets.DOCKERHUB_USERNAME }}/celsiusify:latest" .
 
-         - name: Log in to Docker Hub
-         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+      - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-         - name: Push Docker Image
-         run: docker push "${{ secrets.DOCKERHUB_USERNAME }}"/celsiusify:latest
+      - name: Push Docker Image
+      run: docker push "${{ secrets.DOCKERHUB_USERNAME }}"/celsiusify:latest
 
-   helm:
-      name: Helm Chart Syntax Check
-      runs-on: ubuntu-latest
-      steps:
-         - name: Checkout code
-         uses: actions/checkout@v2
+helm:
+   name: Helm Chart Syntax Check
+   runs-on: ubuntu-latest
+   steps:
+      - name: Checkout code
+      uses: actions/checkout@v2
 
-         - name: Install Helm
-         run: |
-            curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
-            chmod +x get_helm.sh
-            ./get_helm.sh
+      - name: Install Helm
+      run: |
+         curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+         chmod +x get_helm.sh
+         ./get_helm.sh
 
-         - name: Helm Chart Lint
-         run: helm lint ./celsiusify-chart
+      - name: Helm Chart Lint
+      run: helm lint ./celsiusify-chart
 ```
 
 ![github_actions_dashboard](pictures/github_actions_dashboard.jpg)
@@ -381,14 +381,14 @@ Helpful resources:
       In GitHub Actions workflow (`ci.yml`) update the Docker login step to use the secrets:
 
 ``` yaml
-         - name: Build Docker Image
-         run: docker build -t "${{ secrets.DOCKERHUB_USERNAME }}/celsiusify:latest" .
+      - name: Build Docker Image
+      run: docker build -t "${{ secrets.DOCKERHUB_USERNAME }}/celsiusify:latest" .
 
-         - name: Log in to Docker Hub
-         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+      - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-         - name: Push Docker Image
-         run: docker push "${{ secrets.DOCKERHUB_USERNAME }}"/celsiusify:latest
+      - name: Push Docker Image
+      run: docker push "${{ secrets.DOCKERHUB_USERNAME }}"/celsiusify:latest
 ```
 
 `Log in to Docker Hub`' run command retrieves the Docker Hub username and token from the secrets and logs in to Docker Hub using them.
@@ -402,25 +402,25 @@ Helpful resources:
 * A Dockerfile is authored to bundle TensorFlow Serving alongside the TensorFlow model files. This is done to facilitate the use of the model for prediction purposes.
 
 ``` dockerfile
-   FROM tensorflow/serving:latest
+FROM tensorflow/serving:latest
 
-   ENV MODEL_BASE_PATH=/models
-   ENV MODEL_VERSION=/1/
-   ENV MODEL_NAME=saved_model
+ENV MODEL_BASE_PATH=/models
+ENV MODEL_VERSION=/1/
+ENV MODEL_NAME=saved_model
 
-   RUN mkdir -p ${MODEL_BASE_PATH}${MODEL_VERSION}
+RUN mkdir -p ${MODEL_BASE_PATH}${MODEL_VERSION}
 
-   COPY . ${MODEL_BASE_PATH}${MODEL_VERSION}
+COPY . ${MODEL_BASE_PATH}${MODEL_VERSION}
 
-   EXPOSE 8501
+EXPOSE 8501
 
-   RUN echo '#!/bin/bash \n\n\
-   tensorflow_model_server --rest_api_port=8501 \
-   --model_name=${MODEL_NAME} --model_base_path=${MODEL_BASE_PATH} \
-   "$@"' > /usr/bin/tf_serving_entrypoint.sh \
-   && chmod +x /usr/bin/tf_serving_entrypoint.sh
+RUN echo '#!/bin/bash \n\n\
+tensorflow_model_server --rest_api_port=8501 \
+--model_name=${MODEL_NAME} --model_base_path=${MODEL_BASE_PATH} \
+"$@"' > /usr/bin/tf_serving_entrypoint.sh \
+&& chmod +x /usr/bin/tf_serving_entrypoint.sh
 
-   ENTRYPOINT ["/usr/bin/tf_serving_entrypoint.sh"]
+ENTRYPOINT ["/usr/bin/tf_serving_entrypoint.sh"]
 ```
 
 The above Dockerfile is used to create a Docker image of TensorFlow Serving with the model files included. It solves the problem of needing to install TensorFlow Serving and the model files on a machine, which can be a time-consuming and error-prone process.
@@ -432,16 +432,16 @@ The below picture shows command, which is useful to check the structure of the T
 Following bash commands are used to build the Docker image, run the container, and check that the container is listening on port 8501.
 
 ``` bash
-   cd model
-   docker build -t <username>/tf-serving-model-minimal .
-   docker run -p 8501:8501 --name tf-serving-model-container <username>/tf-serving-model-minimal
-   sudo lsof -nP -i | grep LISTEN # (or sudo lsof -nP -iTCP -sTCP:LISTEN)
+cd model
+docker build -t <username>/tf-serving-model-minimal .
+docker run -p 8501:8501 --name tf-serving-model-container <username>/tf-serving-model-minimal
+sudo lsof -nP -i | grep LISTEN # (or sudo lsof -nP -iTCP -sTCP:LISTEN)
 ```
 
 Below, the `curl` command is used to send a POST request with a JSON payload containing an array of temperatures in Fahrenheit to checkout if the TF Serving container is responding correctly.
 
 ``` bash
-   curl -d '{"instances": [80.0, 90.0, 451]}' -X POST http://localhost:8501/v1/models/saved_model:predict
+curl -d '{"instances": [80.0, 90.0, 451]}' -X POST http://localhost:8501/v1/models/saved_model:predict
 ```
 
 ![tf-serving_model_response](pictures/tf-serving_model_response.jpg)
@@ -451,8 +451,8 @@ Below, the `curl` command is used to send a POST request with a JSON payload con
 * The Helm chart is copied to the `model/` directory and updated to facilitate the deployment of the TF Serving image. Then, to deploy the Helm chart with the updated image, the following commands are used:
 
 ``` bash
-   helm package tf-serving-chart
-   helm upgrade -i tf-serving-model tf-serving-model-release-0.1.0.tgz
+helm package tf-serving-chart
+helm upgrade -i tf-serving-model tf-serving-model-release-0.1.0.tgz
 ```
 
 **Performance Testing Incorporation**:
@@ -460,13 +460,13 @@ Below, the `curl` command is used to send a POST request with a JSON payload con
 * The performance tests conducted with Locust are replicated with the TensorFlow Serving deployment to gauge its efficiency. The following commands are used to deploy the Locust chart and configure it to test the TF Serving deployment. The `locust/main.py` file is used to define the Locust test scenarios and the `locust/lib/` directory contains any helper files that may be required.
 
 ``` bash
-   kubectl create configmap tf-serving-loadtest-locustfile --from-file locust/main.py
-   kubectl create configmap tf-serving-loadtest-lib --from-file locust/lib/
-   helm install locust deliveryhero/locust \
-      --set loadtest.name=tf-serving-loadtest \
-      --set loadtest.locust_locustfile_configmap=tf-serving-loadtest-locustfile \
-      --set loadtest.locust_lib_configmap=tf-serving-loadtest-lib
-    kubectl --namespace default port-forward service/locust 8089:8089
+kubectl create configmap tf-serving-loadtest-locustfile --from-file locust/main.py
+kubectl create configmap tf-serving-loadtest-lib --from-file locust/lib/
+helm install locust deliveryhero/locust \
+   --set loadtest.name=tf-serving-loadtest \
+   --set loadtest.locust_locustfile_configmap=tf-serving-loadtest-locustfile \
+   --set loadtest.locust_lib_configmap=tf-serving-loadtest-lib
+kubectl --namespace default port-forward service/locust 8089:8089
 ```
 
 ## Step 7. Statistics files and report
