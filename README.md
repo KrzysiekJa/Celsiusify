@@ -393,7 +393,9 @@ helm:
 
 `Log in to Docker Hub`' run command retrieves the Docker Hub username and token from the secrets and logs in to Docker Hub using them.
 
-* Once secrets have been added and the workflow has been updated, changes need to be committed and pushed to your GitHub repository.
+* Once secrets have been added and the workflow has been updated, changes need to be committed and pushed to GitHub repository.
+
+![github_actions_passed](pictures/github_actions_passed.jpg)
 
 ## Step 6. TensorFlow model with TensorFlow Serving
 
@@ -468,6 +470,8 @@ helm install locust deliveryhero/locust \
    --set loadtest.locust_lib_configmap=tf-serving-loadtest-lib
 kubectl --namespace default port-forward service/locust 8089:8089
 ```
+
+![tfs-model_locust_plots](pictures/tfs-model_locust_plots.jpg)
 
 ## Step 7. Statistics files and report
 
