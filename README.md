@@ -479,6 +479,14 @@ kubectl --namespace default port-forward service/locust 8089:8089
 
 * Performance metrics obtained from testing are meticulously analyzed to discern trends and patterns.
 
+Celsiusify is tested for 5 minutes for 100 users, with spawn rate of 100. Below, test statistics are gathered on plots:
+
+![locust_celsiusify_plots](pictures/locust_celsiusify_plots.png)
+
+TensorFlow Serving is tested for 5 minutes for 100 users, with spawn rate of 100. Below, test statistics are gathered on plots:
+
+![locust_tf_serving_plots](pictures/locust_tf_serving_plots.png)
+
 **`results` Folder Establishment**:
 
 * Within the repository, a designated `results` folder is established to house statistical files in CSV format.
