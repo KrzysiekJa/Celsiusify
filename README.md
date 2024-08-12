@@ -477,7 +477,13 @@ kubectl --namespace default port-forward service/locust 8089:8089
 
 **Evaluation of Performance Metrics**:
 
-* Performance metrics obtained from testing are meticulously analyzed to discern trends and patterns.
+* Performance metrics obtained from rigorous testing are analyzed to discern trends and patterns that emerge from the data, providing invaluable insights into the strengths and weaknesses of the FastAPI solution in comparison to TensorFlow Serving.
+
+**Analysis of Performance Metrics**:
+
+* Requests per Second (Throughput): Number of requests each framework can handle within a given timestamp is assessed, providing insight into scalability.
+* Response Time: Average response time for each framework is calculated, taking into account the time taken to process a request from the moment it is received to the moment a response is sent. This metric is crucial in determining real-world usability.
+* Error Rate: Error rate is calculated to determine reliability in handling requests without encountering errors.
 
 Celsiusify is tested for 5 minutes for 100 users, with spawn rate of 100. Below, test statistics are gathered on plots:
 
@@ -487,8 +493,17 @@ TensorFlow Serving is tested for 5 minutes for 100 users, with spawn rate of 100
 
 ![locust_tf_serving_plots](pictures/locust_tf_serving_plots.png)
 
-**`results` Folder Establishment**:
+**Establishment of `results` Folder**:
 
-* Within the repository, a designated `results` folder is established to house statistical files in CSV format.
-* A concise report, comparing the performance of the FastAPI solution against TensorFlow Serving, is meticulously crafted.
-* This report is transformed into a PDF format and uploaded to the `results` folder within the repository for easy access and reference.
+A designated `results` folder is established within the repository to house statistical files in CSV format. These files contain raw data collected during testing, providing a transparent and reproducible record of findings.
+
+**Report**:
+
+A concise report is generated to compare the performance of the FastAPI solution against TensorFlow Serving. Key findings include:
+
+* Response Time Comparison: TensorFlow Serving achieves a low and stable response time after an initial peak, while the FastAPI solution struggles to maintain a consistent response time.
+* Throughput Analysis: TensorFlow Serving handles more requests per minute, with a rate of around 1500 requests per minute compared to the FastAPI solution's 1200 requests per minute.
+
+**Conclusion**:
+
+Based on the performance metrics analysis and comparison, TensorFlow Serving demonstrates advantages over the FastAPI solution in terms of response time and throughput. The FastAPI solution's inability to maintain a consistent response time and its lower throughput rate suggest that it may not be as suitable for high-performance applications as TensorFlow Serving.
