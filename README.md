@@ -4,6 +4,16 @@
 
 **DevOps** (Development and Operations) work on tasks that **bridge** the gap between software development and IT operations teams.
 
+## Table of Contents
+
+- [Step 1. Backend web application](#step-1-backend-web-application)
+- [Step 2. Docker image](#step-2-docker-image)
+- [Step 3. Helm chart for Celsiusify](#step-3-helm-chart-for-celsiusify)
+- [Step 4. Locust for performance testing](#step-4-locust-for-performance-testing)
+- [Step 5. CI pipeline implementation](#step-5-ci-pipeline-implementation)
+- [Step 6. TensorFlow model with TensorFlow Serving](#step-6-tensorflow-model-with-tensorflow-serving)
+- [Step 7. Statistics files and report](#step-7-statistics-files-and-report)
+
 ## Step 1. Backend web application
 
 **Project Initialization**:
