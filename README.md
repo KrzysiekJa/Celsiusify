@@ -2,6 +2,8 @@
 
 ### DevOps (MLOps) benchmark project
 
+**Celsiusify** is a benchmark project focused on DevOps and MLOps, featuring a FastAPI web application, Docker containerization, Kubernetes deployment using Helm, performance testing with Locust, CI/CD integration via GitHub Actions, and TensorFlow model serving. It aims to streamline the development and deployment processes for machine learning applications. 
+
 **DevOps** (Development and Operations) work on tasks that **bridge** the gap between software development and IT operations teams.
 
 ## Table of Contents
